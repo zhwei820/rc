@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import inspect
 import functools
-from itertools import izip
-
+try:
+    # Python 2
+    from itertools import izip
+except ImportError:
+    # Python 3
+    izip = zip
 from rc.redis_clients import RedisClient
 from rc.redis_cluster import RedisCluster
 from rc.serializer import JSONSerializer

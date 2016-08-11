@@ -23,6 +23,6 @@ def generate_key_for_cached_func(key_prefix, func, *args, **kwargs):
         kwargs = map(lambda t: (u_(t[0]), u_(t[1])), kwargs)
         kwargs = map(lambda t: u'='.join(t), kwargs)
     # handle positional arguments
-    args = map(lambda arg: u_(arg), args)
+    args = [str(x) for x in args]
     # join them together
-    return u' '.join(key_prefix + [module_name, func_name] + args + kwargs)
+    return '_'.join(key_prefix + [module_name, func_name] + args)

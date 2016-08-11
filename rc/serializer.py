@@ -39,4 +39,6 @@ class JSONSerializer(BaseSerializer):
     def loads(self, string):
         if string is None:
             return
-        return json.loads(string)
+        if isinstance(string, bytes):
+            string = string.decode('utf-8')
+        return json.loads(str(string))

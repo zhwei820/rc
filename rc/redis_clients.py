@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 import socket
 import errno
-from itertools import izip
+try:
+    # Python 2
+    from itertools import izip
+except ImportError:
+    # Python 3
+    izip = zip
 
 from redis import StrictRedis
 from redis.client import list_or_args
@@ -158,7 +163,7 @@ class CommandBuffer(object):
                     while 1:
                         try:
                             sent = sock.send(item)
-                        except socket.error, e:
+                        except socket.error as e:
                             if e.errno == errno.EAGAIN:
                                 continue
                             elif e.errno == errno.EWOULDBLOCK:
