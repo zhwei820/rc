@@ -5,6 +5,7 @@ try:
 except ImportError:
     import pickle
 
+from rc.jsonEncoder import CJsonEncoder
 
 class BaseSerializer(object):
     """Baseclass for serializer.  Subclass this to get your own serializer."""
@@ -34,7 +35,7 @@ class JSONSerializer(BaseSerializer):
     """One serializer that uses JSON"""
 
     def dumps(self, obj):
-        return json.dumps(obj)
+        return json.dumps(obj, cls=CJsonEncoder)
 
     def loads(self, string):
         if string is None:
