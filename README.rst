@@ -17,7 +17,7 @@ Installation
 ------------
 
 .. code-block:: bash
-    
+
     $ pip install rc
 
 
@@ -93,3 +93,19 @@ Better
 ------
 
 If you feel anything wrong, feedbacks or pull requests are welcome.
+
+----------
+
+.. code-block:: python
+
+    import asyncio
+    from rc import Cache
+
+    cache = Cache()
+
+    @cache.as_cache()
+    async def as_test():
+        return 'test'
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(as_test())

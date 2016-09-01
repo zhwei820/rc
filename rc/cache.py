@@ -223,6 +223,93 @@ class BaseCache(object):
             return wrapper
         return decorator
 
+
+    def as_cache(self, key_prefix=None, expire=None, include_self=False):
+        """A decorator that is used to cache a function with supplied
+        parameters.  It is intended for decorator usage::
+
+            @cache.as_cache()
+            async def load(name):
+                return load_from_database(name)
+
+            rv = await load('foo')
+            rv = await load('foo') # returned from cache
+
+        The cache key doesn't need to be specified, it will be created with
+        the name of the module + the name of the function + function arguments.
+
+        :param key_prefix: this is used to ensure cache result won't clash
+                           with another function that has the same name
+                           in this module, normally you do not need to pass
+                           this in
+        :param expire: expiration time
+        :param include_self: whether to include the `self` or `cls` as
+                             cache key for method or not, default to be False
+
+        .. note::
+
+            The function being decorated must be called with the same
+            positional and keyword arguments.  Otherwise, you might create
+            multiple caches.  If you pass one parameter as positional, do it
+            always.
+
+        .. note::
+
+            Using objects as part of the cache key is possible, though it is
+            suggested to not pass in an object instance as parameter.  We
+            perform a str() on the passed in objects so that you can provide
+            a __str__ function that returns a identifying string for that
+            object, the unique string will be used as part of the cache key.
+
+        .. note::
+
+            When a method on a class is decorated, the ``self`` or ``cls``
+            arguments is not included in the cache key.  Starting from 0.2
+            you can control it with `include_self`.  If you set
+            `include_self` to True, remember to provide `__str__` method
+            for the object, otherwise you might encounter random behavior.
+
+        .. versionadded:: 0.2
+            The `include_self` parameter was added.
+        """
+        def decorator(f):
+            argspec = inspect.getargspec(f)
+            if argspec and argspec[0] and argspec[0][0] in ('self', 'cls'):
+                has_self = True
+            else:
+                has_self = False
+
+            @functools.wraps(f)
+            async def wrapper(*args, **kwargs):
+                cache_args = args
+                # handle self and cls
+                if has_self:
+                    if not include_self:
+                        cache_args = args[1:]
+                cache_key = generate_key_for_cached_func(
+                    key_prefix, f, *cache_args, **kwargs)
+                if self._running_mode == BATCH_MODE:
+                    promise = Promise()
+                    self._pending_operations.append(
+                        (f, args, kwargs, promise, cache_key, expire))
+                    return promise
+                rv = self._raw_get(cache_key)
+                if rv is None:
+                    value = await f(*args, **kwargs)
+                    rv = self.serializer.dumps(value)
+                    if value not in self.bypass_values:
+                        self._raw_set(cache_key, rv, expire)
+                return self.serializer.loads(rv)
+
+            wrapper.__rc_cache_params__ = {
+                'key_prefix': key_prefix,
+                'expire': expire,
+                'include_self': include_self,
+            }
+            return wrapper
+        return decorator
+
+
     def invalidate(self, func, *args, **kwargs):
         """Invalidate a cache decorated function.  You must call this with
         the same positional and keyword arguments as what you did when you
