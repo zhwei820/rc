@@ -68,7 +68,7 @@ class RedisClusterClient(BaseRedisClient):
 
     def msetex(self, mapping, time):
         commands = []
-        for name, value in mapping.iteritems():
+        for name, value in mapping.items():
             commands.append(('SETEX', name, time, value))
         results = self._execute_multi_command_with_poller('SETEX', commands)
         return all(results.values())
@@ -107,7 +107,7 @@ class RedisClusterClient(BaseRedisClient):
                     if wbuf.has_pending_request:
                         wbuf.send_pending_request()
         # clean
-        for _, buf in bufs.iteritems():
+        for _, buf in bufs.items():
             connection_pool.release(buf.connection)
         return results
 

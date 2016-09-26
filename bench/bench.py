@@ -46,7 +46,7 @@ def bench_clients(keys):
             hostname = cluster_router.get_host_for_key(key)
             hostname_to_keys.setdefault(hostname, []).append(key)
         result = {}
-        for hostname, hostkeys in hostname_to_keys.iteritems():
+        for hostname, hostkeys in hostname_to_keys.items():
             rv = clients[hostname].mget(hostkeys)
             result.update(dict(izip(hostkeys, rv)))
         [result[k] for k in current_keys]

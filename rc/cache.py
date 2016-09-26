@@ -124,7 +124,7 @@ class BaseCache(object):
         if not mapping:
             return True
         rv = True
-        for key, value in mapping.iteritems():
+        for key, value in mapping.items():
             if not self.set(key, value, expire):
                 rv = False
         return rv
@@ -436,7 +436,7 @@ class Cache(BaseCache):
         if expire is None:
             expire = self.default_expire
         pipe = self.client.pipeline()
-        for key, value in mapping.iteritems():
+        for key, value in mapping.items():
             string = self.serializer.dumps(value)
             pipe.setex(self.namespace + key, expire, string)
         return all(pipe.execute())
@@ -518,7 +518,7 @@ class CacheCluster(BaseCache):
         if expire is None:
             expire = self.default_expire
         string_mapping = {}
-        for key, value in mapping.iteritems():
+        for key, value in mapping.items():
             string = self.serializer.dumps(value)
             string_mapping[self.namespace + key] = string
         return self.client.msetex(string_mapping, expire)
