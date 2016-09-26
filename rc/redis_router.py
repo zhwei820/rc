@@ -31,10 +31,10 @@ class RedisCRC32HashRouter(BaseRedisRouter):
         self._sorted_host_names = sorted(hosts.keys())
 
     def get_host_for_key(self, key):
-        if isinstance(key, unicode):
-            key = key.encode('utf-8')
-        else:
-            key = str(key)
+        # if isinstance(key, unicode):
+        #     key = key.encode('utf-8')
+        # else:
+        key = str(key)
         pos = crc32(key) % len(self._sorted_host_names)
         return self._sorted_host_names[pos]
 

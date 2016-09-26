@@ -29,10 +29,10 @@ class HashRing(object):
 
             ks = math.floor((40 * len(self._nodes) * weight) / total_weight)
 
-            for i in xrange(0, int(ks)):
+            for i in range(0, int(ks)):
                 k = md5_bytes('%s-%s-salt' % (node, i))
 
-                for l in xrange(0, 4):
+                for l in range(0, 4):
                     key = ((k[3 + l * 4] << 24) | (k[2 + l * 4] << 16) |
                            (k[1 + l * 4] << 8) | k[l * 4])
                     self._hashring[key] = node
@@ -44,8 +44,8 @@ class HashRing(object):
         if not self._hashring:
             return
 
-        if isinstance(key, unicode):
-            key = key.encode('utf8')
+        # if isinstance(key, unicode):
+        #     key = key.encode('utf8')
 
         k = md5_bytes(key)
         key = (k[3] << 24) | (k[2] << 16) | (k[1] << 8) | k[0]

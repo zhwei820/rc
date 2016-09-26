@@ -222,7 +222,7 @@ class CommandBuffer(object):
             rv = client.parse_response(self.connection, self.command_name)
         else:
             rv = []
-            for i in xrange(len(self.pending_commands)):
+            for i in range(len(self.pending_commands)):
                 rv.append(client.parse_response(
                     self.connection, self.command_name))
         if self.command_name == 'DEL':

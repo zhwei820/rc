@@ -6,7 +6,7 @@ def test_redis_cluster_client_basic_operations(redis_hosts):
     client = cluster.get_client()
 
     keys = []
-    for i in xrange(10):
+    for i in range(10):
         key = 'test key: %s' % i
         keys.append(key)
         client.set(key, i)
@@ -15,7 +15,7 @@ def test_redis_cluster_client_basic_operations(redis_hosts):
     assert client.mget(keys) == map(str, range(10))
 
     keys = []
-    for i in xrange(10, 20):
+    for i in range(10, 20):
         key = 'test key: %s' % i
         keys.append(key)
         client.setex(key, 100, i)
@@ -25,11 +25,11 @@ def test_redis_cluster_client_basic_operations(redis_hosts):
 
     keys = []
     deleted_keys = []
-    for i in xrange(20, 30):
+    for i in range(20, 30):
         key = 'test key: %s' % i
         keys.append(key)
         client.setex(key, 100, i)
-    for i in xrange(20, 25):
+    for i in range(20, 25):
         key = 'test key: %s' % i
         deleted_keys.append(key)
         client.delete(key)
@@ -42,7 +42,7 @@ def test_redis_cluster_client_basic_operations(redis_hosts):
     keys = []
     mapping = {}
     deleted_keys = []
-    for i in xrange(30, 40):
+    for i in range(30, 40):
         key = 'test key: %s' % i
         mapping[key] = i
         keys.append(key)
@@ -50,7 +50,7 @@ def test_redis_cluster_client_basic_operations(redis_hosts):
     for i, key in enumerate(keys, 30):
         assert client.get(key) == str(i)
     assert client.mget(keys) == map(str, range(30, 40))
-    for i in xrange(30, 35):
+    for i in range(30, 35):
         key = 'test key: %s' % i
         deleted_keys.append(key)
     assert client.mdelete(*deleted_keys)
