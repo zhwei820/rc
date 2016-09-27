@@ -17,4 +17,4 @@ def test_all_pollers(redis_hosts, poller, monkeypatch):
         key = 'key-%s' % i
         keys.append(key)
         cluster_client.set(key, i)
-    assert cluster_client.mget(keys) == map(str, range(10))
+    assert cluster_client.mget(keys) == [bytes(str(ii), encoding='utf-8') for ii in  range(10)]

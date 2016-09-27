@@ -34,7 +34,8 @@ class RedisCRC32HashRouter(BaseRedisRouter):
         # if isinstance(key, unicode):
         #     key = key.encode('utf-8')
         # else:
-        key = str(key)
+        # key = str(key)
+        key = bytes(key, encoding='utf-8')
         pos = crc32(key) % len(self._sorted_host_names)
         return self._sorted_host_names[pos]
 

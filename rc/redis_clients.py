@@ -94,8 +94,8 @@ class RedisClusterClient(BaseRedisClient):
         results = {}
         remaining_buf_items = bufs.items()
         while remaining_buf_items:
-            buf_items = remaining_buf_items[:self.max_concurrency]
-            remaining_buf_items = remaining_buf_items[self.max_concurrency:]
+            buf_items = list(remaining_buf_items)[:self.max_concurrency]
+            remaining_buf_items = list(remaining_buf_items)[self.max_concurrency:]
             bufs_poll = poller(buf_items)
             while bufs_poll:
                 rlist, wlist = bufs_poll.poll(self.poller_timeout)

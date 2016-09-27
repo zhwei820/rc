@@ -17,10 +17,10 @@ class RedisServer(object):
     def __init__(self, socket_path):
         self.socket_path = socket_path
         self.redis = Popen(['redis-server', '-'], stdin=PIPE, stdout=devnull)
-        self.redis.stdin.write('''
+        self.redis.stdin.write(bytes('''
         port 0
         unixsocket %s
-        save ""''' % socket_path)
+        save ""''' % socket_path, encoding = "utf8"))
         self.redis.stdin.flush()
         self.redis.stdin.close()
         while 1:
@@ -70,4 +70,4 @@ def redis_hosts(request):
 
 @pytest.fixture(scope='session')
 def redis_unix_socket_path(redis_hosts):
-    return redis_hosts.values()[0]['unix_socket_path']
+    return list(redis_hosts.values())[0]['unix_socket_path']

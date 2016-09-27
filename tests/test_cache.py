@@ -77,7 +77,7 @@ def test_cache_decorator_basic_apis(redis_unix_socket_path):
         return ' '.join(('load', name, offset))
     rv = load('name', 'offset')
     print(rv)
-    assert isinstance(rv, unicode)
+    assert isinstance(rv, str)
     assert rv == 'load name offset'
     assert load('name', offset='offset') == 'load name offset'
 
@@ -149,6 +149,30 @@ def test_cache_decorator_include_self(redis_unix_socket_path):
     assert user02.load('name', 'offset') == 'load name offset'
 
 
+def test_cache_batch_mode(redis_unix_socket_path):
+    cache = Cache(redis_options={'unix_socket_path': redis_unix_socket_path})
+
+    @cache.cache()
+    def cache_batch_test_func(value):
+        return value
+
+    with cache.batch_mode():
+        pass
+
+    results = []
+    with cache.batch_mode():
+        for i in range(10):
+            rv = cache_batch_test_func(i)
+            assert rv.is_pending
+            assert rv.value is None
+            results.append(rv)
+    for i, rv in enumerate(results):
+        assert rv.is_resolved
+        assert rv.value == i
+
+    for i in range(20):
+        assert cache_batch_test_func(i) == i
+
 def test_cache_cluster_basic_apis(redis_hosts):
     cache = CacheCluster(redis_hosts)
     assert cache.get('key') is None
@@ -186,31 +210,7 @@ def test_cache_cluster_namespace(redis_hosts):
     assert cache01.get('key') == 'value'
     assert cache02.get('key') is None
 
-
-def test_cache_batch_mode(redis_unix_socket_path):
-    cache = Cache(redis_options={'unix_socket_path': redis_unix_socket_path})
-
-    @cache.cache()
-    def cache_batch_test_func(value):
-        return value
-
-    with cache.batch_mode():
-        pass
-
-    results = []
-    with cache.batch_mode():
-        for i in range(10):
-            rv = cache_batch_test_func(i)
-            assert rv.is_pending
-            assert rv.value is None
-            results.append(rv)
-    for i, rv in enumerate(results):
-        assert rv.is_resolved
-        assert rv.value == i
-
-    for i in range(20):
-        assert cache_batch_test_func(i) == i
-
+#
 
 def test_cache_cluster_batch_mode(redis_hosts):
     cache = CacheCluster(redis_hosts)
